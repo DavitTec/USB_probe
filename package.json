@@ -21,7 +21,7 @@
     "davittec"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "packageManager": "pnpm@10.7.1",
   "devDependencies": {
     "commitizen": "^4.3.1",
