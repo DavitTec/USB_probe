@@ -1,6 +1,6 @@
 #!/bin/bash
 # usb_info.sh
-# version 0.8
+# version 0.9
 # Detects USB ports, gathers pendrive info, creates USB_Registry.json
 # Requires sudo for lsusb, lsblk, blkid, and file operations
 
@@ -85,24 +85,15 @@ check_sudo() {
 
 # Check dependencies
 check_dependencies() {
-  if ! command -v jq >/dev/null 2>&1; then
-    feedback "ERROR: jq is not installed."
-    log "ERROR" "jq is not installed"
-    exit 1
-  fi
-  if ! command -v lsblk >/dev/null 2>&1; then
-    feedback "ERROR: lsblk is not installed."
-    log "ERROR" "lsblk is not installed"
-    exit 1
-  fi
-  if ! command -v lsusb >/dev/null 2>&1; then
-    feedback "ERROR: lsusb is not installed."
-    log "ERROR" "lsusb is not installed"
-    exit 1
-  fi
-  if ! command -v blkid >/dev/null 2>&1; then
-    feedback "ERROR: blkid is not installed."
-    log "ERROR" "blkid is not installed"
+  local missing=()
+  for cmd in jq lsblk lsusb blkid; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+      missing+=("$cmd")
+    fi
+  done
+  if [[ ${#missing[@]} -gt 0 ]]; then
+    feedback "ERROR: Missing dependencies: ${missing[*]}"
+    log "ERROR" "Missing dependencies: ${missing[*]}"
     exit 1
   fi
   log "INFO" "All dependencies present"
@@ -115,12 +106,15 @@ prompt_remove_usb() {
   read -r
   # Unmount any USB devices
   local mounts
-  mounts=$(lsblk -J | jq -r '.blockdevices[] | select(.type=="disk") | .children[]?.mountpoint' 2>/dev/null | grep -v null)
+  mounts=$(lsblk -J 2>/dev/null | jq -r '.blockdevices[] | select(.type=="disk") | .children[]?.mountpoint' 2>/dev/null | grep -v null)
   if [[ -n "$mounts" ]]; then
     while IFS= read -r mount; do
       if ! umount "$mount" 2>/dev/null; then
         feedback "WARNING: Failed to unmount $mount"
         log "WARNING" "Failed to unmount $mount"
+      else
+        feedback "Unmounted $mount"
+        log "INFO" "Unmounted $mount"
       fi
     done <<< "$mounts"
   fi
@@ -146,7 +140,11 @@ create_baseline_registry() {
     log "ERROR" "Failed to create baseline JSON: usb=$usb_info, lsblk=$lsblk_info, blkid=$blkid_info"
     exit 1
   fi
-  echo "$baseline" >"$TEMP_REGISTRY"
+  if ! echo "$baseline" >"$TEMP_REGISTRY"; then
+    feedback "ERROR: Cannot write to $TEMP_REGISTRY"
+    log "ERROR" "Cannot write to $TEMP_REGISTRY"
+    exit 1
+  fi
   log "INFO" "Baseline registry created: $baseline"
 }
 
@@ -162,7 +160,7 @@ gather_pendrive_info() {
   feedback "Gathering pendrive information..."
   log "INFO" "Starting pendrive info collection"
   local lsblk_output
-  lsblk_output=$(lsblk -J 2>/dev/null)
+  lsblk_output=$(lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID 2>/dev/null)
   log "INFO" "lsblk output: $lsblk_output"
   if [[ -z "$lsblk_output" ]]; then
     feedback "ERROR: lsblk output is empty."
@@ -170,7 +168,7 @@ gather_pendrive_info() {
     exit 1
   fi
   local pendrives
-  pendrives=$(echo "$lsblk_output" | jq '.blockdevices[] | select(.type=="disk")' 2>/dev/null)
+  pendrives=$(echo "$lsblk_output" | jq '.blockdevices[] | select(.type=="disk" or (.children[]?.type=="part"))' 2>/dev/null)
   # shellcheck disable=SC2181
   if [[ $? -ne 0 ]]; then
     feedback "ERROR: Failed to parse lsblk output with jq."
@@ -183,7 +181,7 @@ gather_pendrive_info() {
     exit 1
   fi
   local count
-  count=$(echo "$pendrives" | jq -s 'length')
+  count=$(echo "$lsblk_output" | jq '.blockdevices[] | select(.type=="disk" or (.children[]?.type=="part")) | .name' | jq -s 'length')
   log "INFO" "Found $count pendrives: $pendrives"
   local usb_info
   usb_info=$(lsusb -v 2>/dev/null)
@@ -197,6 +195,12 @@ gather_pendrive_info() {
   local pendrive_details
   pendrive_details=$(jq -n --arg lsblk "$pendrives" --arg usb "$usb_info" --arg blkid "$blkid_info" --arg df "$df_info" \
     '{lsblk: $lsblk, usb: $usb, blkid: $blkid, df: $df}' 2>/dev/null)
+  # shellcheck disable=SC2181
+  if [[ $? -ne 0 ]]; then
+    feedback "ERROR: Failed to create pendrive JSON."
+    log "ERROR" "Failed to create pendrive JSON: $pendrive_details"
+    exit 1
+  fi
   log "INFO" "Pendrive details: $pendrive_details"
   echo "$pendrive_details"
 }
@@ -206,10 +210,16 @@ compare_registries() {
   local baseline="$1"
   local current="$2"
   feedback "Comparing USB registries..."
-  log "INFO" "Comparing baseline: $baseline with current: $current"
+  log "INFO" "Comparing baseline and current registries"
   local diff
   diff=$(jq -n --arg baseline "$baseline" --arg current "$current" \
     '{changes: ($current | fromjson | .lsblk != ($baseline | fromjson | .lsblk))}' 2>/dev/null)
+  # shellcheck disable=SC2181
+  if [[ $? -ne 0 ]]; then
+    feedback "ERROR: Failed to compare registries."
+    log "ERROR" "Failed to compare registries: baseline=$baseline, current=$current"
+    exit 1
+  fi
   log "INFO" "Registry comparison: $diff"
   echo "$diff"
 }
@@ -236,10 +246,20 @@ choose_pendrive() {
   feedback "Available pendrives:"
   local names
   names=$(echo "$pendrive_info" | jq -r '.lsblk | .name' 2>/dev/null)
+  if [[ -z "$names" ]]; then
+    feedback "No valid pendrive names found."
+    log "ERROR" "No valid pendrive names found: $pendrive_info"
+    exit 1
+  fi
   log "INFO" "Available pendrives: $names"
   echo "$names" | tr ' ' '\n'
   log "INFO" "Prompting user to choose pendrive"
   read -r -p "Enter pendrive device name (e.g., sdb): " device_name
+  if [[ -z "$device_name" ]]; then
+    feedback "ERROR: No device name entered."
+    log "ERROR" "No device name entered"
+    exit 1
+  fi
   log "INFO" "User entered device name: $device_name"
   # Validate device
   if ! echo "$pendrive_info" | jq -e ".lsblk | select(.name==\"$device_name\")" >/dev/null 2>&1; then
@@ -248,7 +268,18 @@ choose_pendrive() {
     exit 1
   fi
   local mount_point
-  mount_point=$(echo "$pendrive_info" | jq -r ".lsblk | select(.name==\"$device_name\") | .mountpoint // \"\"")
+  mount_point=$(echo "$pendrive_info" | jq -r ".lsblk | select(.name==\"$device_name\") | .mountpoint // .children[]?.mountpoint // \"\"" 2>/dev/null)
+  if [[ -z "$mount_point" ]]; then
+    feedback "WARNING: No mount point found for $device_name. Attempting to mount..."
+    log "INFO" "Attempting to mount $device_name"
+    mount_point="/media/david/$device_name"
+    if ! mkdir -p "$mount_point" || ! mount "/dev/$device_name" "$mount_point" 2>/dev/null; then
+      feedback "ERROR: Failed to mount $device_name."
+      log "ERROR" "Failed to mount $device_name"
+      exit 1
+    fi
+    log "INFO" "Mounted $device_name at $mount_point"
+  fi
   log "INFO" "User chose pendrive: $device_name, mount point: $mount_point"
   echo "$device_name $mount_point"
 }
@@ -330,3 +361,5 @@ main() {
 
 # Run main
 main "$@"
+
+# end of script

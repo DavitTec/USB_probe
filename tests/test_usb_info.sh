@@ -43,6 +43,7 @@ fi
 
 # Test 3: Check pendrive detection
 echo "Testing pendrive detection..."
+# shellcheck disable=SC2024
 echo -e "\nsdb\n" | sudo bash "$SCRIPT_DIR/../scripts/usb_info.sh" >"$LOG_DIR/test_output.log" 2>&1
 if grep -q "User chose pendrive: sdb" "$LOG_DIR/usb_script.log"; then
   echo "Test passed: Pendrive detected"
@@ -53,3 +54,5 @@ else
 fi
 
 echo "All tests passed!"
+
+# End of test_usb_info.sh
