@@ -1,10 +1,14 @@
 {
-  "name": "USB_probe",
+  "name": "usb-probe",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "shellcheck scripts/*.sh && prettier --check .",
+    "format": "prettier --write .",
+    "test": "bash tests/test_usb_info.sh",
+    "commit": "cz",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +20,10 @@
     "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "shellcheck": "^3.1.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
