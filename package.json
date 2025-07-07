@@ -8,7 +8,7 @@
     "format": "prettier --write .",
     "test": "bash tests/test_usb_info.sh",
     "commit": "cz",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
