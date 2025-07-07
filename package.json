@@ -10,7 +10,16 @@
     "commit": "cz",
     "prepare": "husky"
   },
-  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davittec/usb-probe.git"
+  },
+  "keywords": [
+    "usb",
+    "probe",
+    "usb-probe",
+    "davittec"
+  ],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.7.1",
