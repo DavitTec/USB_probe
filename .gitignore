@@ -1,0 +1,7 @@
+node_modules/
+logs/
+
+/tmp/*.json
+.env
+# Ignore all files in the .davit directory
+.davit/
