@@ -1,0 +1,4 @@
+jq
+usbutils
+util-linux
+coreutils
