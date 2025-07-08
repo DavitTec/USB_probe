@@ -8,7 +8,10 @@
     "format": "prettier --write .",
     "test": "bash tests/test_usb_info.sh",
     "commit": "cz",
-    "prepare": "husky"
+    "prepare": "husky",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "changelog:first": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
+    "changelog:fix": "./scripts/changelog-fix.sh"
   },
   "repository": {
     "type": "git",
