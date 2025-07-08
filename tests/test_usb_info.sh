@@ -1,6 +1,6 @@
 #!/bin/bash
 # test_usb_info.sh
-# version 0.3
+# version 0.4
 # Minimal test cases for usb_info.sh
 
 # Resolve script directory
@@ -15,6 +15,11 @@ else
   exit 1
 fi
 
+# Logging function
+log() {
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] $1" >>"$LOG_DIR/test.log"
+}
+
 # Test 1: Check dependencies
 echo "Testing dependencies..."
 missing=()
@@ -25,33 +30,37 @@ for cmd in jq lsblk lsusb blkid; do
 done
 if [[ ${#missing[@]} -gt 0 ]]; then
   echo "ERROR: Missing dependencies: ${missing[*]}"
+  log "ERROR: Missing dependencies: ${missing[*]}"
   exit 1
 fi
 echo "Test passed: All dependencies present"
+log "Test passed: Dependencies check"
 
-# Test 2: Run script with no USBs
+# Test 2: Check lsblk output with no USBs
 echo "Testing lsblk output with no USBs..."
-# shellcheck disable=SC2024
-echo -e "\n" | sudo bash "$SCRIPT_DIR/../scripts/usb_info.sh" >"$LOG_DIR/test_output.log" 2>&1
-if grep -q "No pendrives detected" "$LOG_DIR/usb_script.log"; then
+sudo bash "$SCRIPT_DIR/../scripts/usb_info.sh"
+if grep -q "No removable pendrives detected" "$LOG_DIR/usb_script.log"; then
   echo "Test passed: No pendrives detected"
+  log "Test passed: No pendrives detected"
 else
   echo "Test failed: Expected no pendrives"
   cat "$LOG_DIR/usb_script.log"
   cat "$LOG_DIR/test_output.log"
+  log "Test failed: Expected no pendrives"
   exit 1
 fi
 
 # Test 3: Check pendrive detection
 echo "Testing pendrive detection..."
-# shellcheck disable=SC2024
-echo -e "\nsdb\n" | sudo bash "$SCRIPT_DIR/../scripts/usb_info.sh" >"$LOG_DIR/test_output.log" 2>&1
+sudo bash "$SCRIPT_DIR/../scripts/usb_info.sh"
 if grep -q "User chose pendrive: sdb" "$LOG_DIR/usb_script.log"; then
   echo "Test passed: Pendrive sdb detected"
+  log "Test passed: Pendrive sdb detected"
 else
   echo "Test failed: Expected pendrive sdb"
   cat "$LOG_DIR/usb_script.log"
   cat "$LOG_DIR/test_output.log"
+  log "Test failed: Expected pendrive sdb"
   exit 1
 fi
 
@@ -61,16 +70,20 @@ if [[ -f "$LOG_DIR/lsblk_output_none.json" && -f "$LOG_DIR/lsblk_output_TEST1.js
   diff_output=$(diff "$LOG_DIR/lsblk_output_none.json" "$LOG_DIR/lsblk_output_TEST1.json")
   if [[ -n "$diff_output" ]]; then
     echo "Test passed: Differences found between lsblk outputs"
-    log "INFO" "lsblk diff: $diff_output"
+    echo "$diff_output"
+    log "Test passed: lsblk diff: $diff_output"
   else
     echo "Test failed: No differences found"
+    log "Test failed: No differences found"
     exit 1
   fi
 else
   echo "Test failed: lsblk output files missing"
+  log "Test failed: lsblk output files missing"
   exit 1
 fi
 
 echo "All tests passed!"
+log "All tests passed"
 
 # End of test_usb_info.sh
