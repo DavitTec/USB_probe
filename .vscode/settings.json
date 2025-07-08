@@ -1,0 +1,23 @@
+{
+  "editor.fontSize": 12,
+  "editor.tabSize": 2,
+  "shellformat.flag": "-i 2",
+  "files.autoSave": "afterDelay",
+  "editor.codeActionsOnSave": {
+    "source.addMissingImports": "always",
+    "source.addMissingImports.ts": "always",
+    "source.fixAll": "always",
+    "source.sort.json": "never"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "eslint.validate": ["javascript", "json", "markdown", "typescript"],
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/node_modules/**": true
+  },
+  "prettier.prettierPath": "./node_modules/prettier"
+}
