@@ -1,6 +1,6 @@
 #!/bin/bash
 # usb_info.sh
-# version 0.9
+# version 0.10
 # Detects USB ports, gathers pendrive info, creates USB_Registry.json
 # Requires sudo for lsusb, lsblk, blkid, and file operations
 
@@ -18,8 +18,10 @@ fi
 
 # Define files
 LOG_FILE="$LOG_DIR/usb_script.log"
-TEMP_REGISTRY="/tmp/usb_baseline.json"
+TEMP_REGISTRY="$LOG_DIR/usb_baseline.json"
 LOCAL_REGISTRY="$REGISTRY_DIR/USB_Registry.json"
+LSBLK_NONE="$LOG_DIR/lsblk_output_none.json"
+LSBLK_TEST="$LOG_DIR/lsblk_output_TEST1.json"
 
 # Create log directory
 if [ ! -d "$LOG_DIR" ]; then
@@ -106,7 +108,7 @@ prompt_remove_usb() {
   read -r
   # Unmount any USB devices
   local mounts
-  mounts=$(lsblk -J 2>/dev/null | jq -r '.blockdevices[] | select(.type=="disk") | .children[]?.mountpoint' 2>/dev/null | grep -v null)
+  mounts=$(lsblk -J 2>/dev/null | jq -r '.blockdevices[] | select(.type=="disk") | .children[]?.mountpoint // empty' 2>/dev/null | grep -v null)
   if [[ -n "$mounts" ]]; then
     while IFS= read -r mount; do
       if ! umount "$mount" 2>/dev/null; then
@@ -118,6 +120,9 @@ prompt_remove_usb() {
       fi
     done <<< "$mounts"
   fi
+  # Save lsblk output (no pendrives)
+  lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID >"$LSBLK_NONE" 2>/dev/null
+  log "INFO" "Saved lsblk output (no pendrives) to $LSBLK_NONE"
   log "INFO" "USB removal prompt completed"
 }
 
@@ -128,7 +133,7 @@ create_baseline_registry() {
   local usb_info
   usb_info=$(lsusb -v 2>/dev/null)
   local lsblk_info
-  lsblk_info=$(lsblk -J 2>/dev/null)
+  lsblk_info=$(lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID 2>/dev/null)
   local blkid_info
   blkid_info=$(blkid 2>/dev/null)
   local baseline
@@ -153,6 +158,9 @@ prompt_reattach_usb() {
   feedback "Please reattach USB pendrives and press Enter to continue..."
   log "INFO" "Prompting user to reattach USB pendrives"
   read -r
+  # Save lsblk output (with pendrives)
+  lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID >"$LSBLK_TEST" 2>/dev/null
+  log "INFO" "Saved lsblk output (with pendrives) to $LSBLK_TEST"
 }
 
 # Gather pendrive info
@@ -168,20 +176,20 @@ gather_pendrive_info() {
     exit 1
   fi
   local pendrives
-  pendrives=$(echo "$lsblk_output" | jq '.blockdevices[] | select(.type=="disk" or (.children[]?.type=="part"))' 2>/dev/null)
-  # shellcheck disable=SC2181
+  pendrives=$(echo "$lsblk_output" | jq '[.blockdevices[] | select(.type=="disk" and .name | test("^sd[a-z]+$")) | {name, size, type, fstype, label, mountpoint, uuid, children: (.children // [] | map(select(.type=="part") | {name, size, type, fstype, label, mountpoint, uuid}))}]' 2>/dev/null)
+# shellcheck disable=SC2181  
   if [[ $? -ne 0 ]]; then
     feedback "ERROR: Failed to parse lsblk output with jq."
     log "ERROR" "Failed to parse lsblk output: $lsblk_output"
     exit 1
   fi
-  if [[ -z "$pendrives" ]]; then
+  if [[ -z "$pendrives" || "$pendrives" == "[]" ]]; then
     feedback "No pendrives found."
     log "ERROR" "No pendrives detected"
     exit 1
   fi
   local count
-  count=$(echo "$lsblk_output" | jq '.blockdevices[] | select(.type=="disk" or (.children[]?.type=="part")) | .name' | jq -s 'length')
+  count=$(echo "$pendrives" | jq 'length')
   log "INFO" "Found $count pendrives: $pendrives"
   local usb_info
   usb_info=$(lsusb -v 2>/dev/null)
@@ -194,7 +202,7 @@ gather_pendrive_info() {
   log "INFO" "df info: $df_info"
   local pendrive_details
   pendrive_details=$(jq -n --arg lsblk "$pendrives" --arg usb "$usb_info" --arg blkid "$blkid_info" --arg df "$df_info" \
-    '{lsblk: $lsblk, usb: $usb, blkid: $blkid, df: $df}' 2>/dev/null)
+    '{lsblk: ($lsblk | fromjson), usb: $usb, blkid: $blkid, df: $df}' 2>/dev/null)
   # shellcheck disable=SC2181
   if [[ $? -ne 0 ]]; then
     feedback "ERROR: Failed to create pendrive JSON."
@@ -222,6 +230,15 @@ compare_registries() {
   fi
   log "INFO" "Registry comparison: $diff"
   echo "$diff"
+  # Compare lsblk outputs with meld
+  if command -v meld >/dev/null 2>&1; then
+    feedback "Opening meld to compare $LSBLK_NONE and $LSBLK_TEST"
+    log "INFO" "Opening meld to compare lsblk outputs"
+    meld "$LSBLK_NONE" "$LSBLK_TEST" &
+  else
+    feedback "WARNING: meld not installed, skipping visual diff."
+    log "WARNING" "meld not installed"
+  fi
 }
 
 # Check USB speed
@@ -245,7 +262,7 @@ choose_pendrive() {
   local pendrive_info="$1"
   feedback "Available pendrives:"
   local names
-  names=$(echo "$pendrive_info" | jq -r '.lsblk | .name' 2>/dev/null)
+  names=$(echo "$pendrive_info" | jq -r '.lsblk[].name' 2>/dev/null)
   if [[ -z "$names" ]]; then
     feedback "No valid pendrive names found."
     log "ERROR" "No valid pendrive names found: $pendrive_info"
@@ -262,13 +279,13 @@ choose_pendrive() {
   fi
   log "INFO" "User entered device name: $device_name"
   # Validate device
-  if ! echo "$pendrive_info" | jq -e ".lsblk | select(.name==\"$device_name\")" >/dev/null 2>&1; then
+  if ! echo "$pendrive_info" | jq -e ".lsblk[] | select(.name==\"$device_name\")" >/dev/null 2>&1; then
     feedback "Invalid pendrive device."
     log "ERROR" "Invalid pendrive choice: $device_name"
     exit 1
   fi
   local mount_point
-  mount_point=$(echo "$pendrive_info" | jq -r ".lsblk | select(.name==\"$device_name\") | .mountpoint // .children[]?.mountpoint // \"\"" 2>/dev/null)
+  mount_point=$(echo "$pendrive_info" | jq -r ".lsblk[] | select(.name==\"$device_name\") | .mountpoint // (.children[]?.mountpoint // \"\") | select(. != \"\")" 2>/dev/null | head -n 1)
   if [[ -z "$mount_point" ]]; then
     feedback "WARNING: No mount point found for $device_name. Attempting to mount..."
     log "INFO" "Attempting to mount $device_name"
