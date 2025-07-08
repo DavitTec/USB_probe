@@ -30,7 +30,7 @@ fi
 echo "Test passed: All dependencies present"
 
 # Test 2: Run script with no USBs
-echo "Testing lsblk output with no USBs...
+echo "Testing lsblk output with no USBs..."
 # shellcheck disable=SC2024
 echo -e "\n" | sudo bash "$SCRIPT_DIR/../scripts/usb_info.sh" >"$LOG_DIR/test_output.log" 2>&1
 if grep -q "No pendrives detected" "$LOG_DIR/usb_script.log"; then
