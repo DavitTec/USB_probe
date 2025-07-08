@@ -1,6 +1,8 @@
-# Changelog
+# CHANGELOG
 
-## 0.0.1 (2025-07-08)
+
+## [0.0.2](https://github.com/davittec/usb-probe/compare/5228d5bff549b701566bc6376ed2f49b476fc58f...v0.0.2) (2025-07-08)
+
 
 ### Bug Fixes
 
@@ -12,9 +14,15 @@
 - update scripts ([d3a6918](https://github.com/davittec/usb-probe/commit/d3a6918b5847984c14bd038a27e9b77a9e7eecc9))
 - update test_usb_info.sh v0.2 ([0593be5](https://github.com/davittec/usb-probe/commit/0593be5a065aac2cb736b7d8bb3f38e2d2e46491))
 
+
 ### Features
 
 - add usb_info.sh 0.8 ([38e1373](https://github.com/davittec/usb-probe/commit/38e1373ea0bc66d1b167f074b89ccfb969b21f90))
 - adding test1 test_usb_info.sh v0.1 ([b6e1d86](https://github.com/davittec/usb-probe/commit/b6e1d86ce70294b7db31df02c7cbc30907dd4ef8))
+- **changlog-fix:** add and update changelog-fix script ([0cd17a4](https://github.com/davittec/usb-probe/commit/0cd17a4d3358c4cd3e82497af124df2c967a511b))
+- **release script:** added the release.sh v0.2.2 script ([f75125d](https://github.com/davittec/usb-probe/commit/f75125dc787775f48868831ce134e0aaa3e4447a))
 - update package.json ([ebf6149](https://github.com/davittec/usb-probe/commit/ebf6149cb06f8452a7fb491bc32a04362c1d285b))
 - update package.json and packages ([5228d5b](https://github.com/davittec/usb-probe/commit/5228d5bff549b701566bc6376ed2f49b476fc58f))
+
+
+
