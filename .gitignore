@@ -10,7 +10,9 @@ pnpm-lock.yaml
 .env
 # Ignore all files in the .davit directory
 .davit/
+archives/
 
+# Ignore all files in the .vscode directory
 # Logs
 logs/
 logs
