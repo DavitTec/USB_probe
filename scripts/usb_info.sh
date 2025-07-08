@@ -395,3 +395,5 @@ main() {
 
 # Run main
 main "$@"
+
+# End of script

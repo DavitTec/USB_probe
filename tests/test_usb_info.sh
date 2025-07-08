@@ -1,6 +1,6 @@
 #!/bin/bash
 # test_usb_info.sh
-# version 0.4
+# version 0.5
 # Minimal test cases for usb_info.sh
 
 # Resolve script directory
@@ -38,8 +38,11 @@ log "Test passed: Dependencies check"
 
 # Test 2: Check lsblk output with no USBs
 echo "Testing lsblk output with no USBs..."
-sudo bash "$SCRIPT_DIR/../scripts/usb_info.sh"
-if grep -q "No removable pendrives detected" "$LOG_DIR/usb_script.log"; then
+echo "Please remove all USB pendrives and press Enter..."
+read -r
+# shellcheck disable=SC2024
+sudo bash "$SCRIPT_DIR/../scripts/usb_info.sh" >"$LOG_DIR/test_output.log" 2>&1
+if grep -q "No USB pendrives detected" "$LOG_DIR/usb_script.log"; then
   echo "Test passed: No pendrives detected"
   log "Test passed: No pendrives detected"
 else
@@ -52,7 +55,10 @@ fi
 
 # Test 3: Check pendrive detection
 echo "Testing pendrive detection..."
-sudo bash "$SCRIPT_DIR/../scripts/usb_info.sh"
+echo "Please attach a USB pendrive and press Enter..."
+read -r
+# shellcheck disable=SC2024
+sudo bash "$SCRIPT_DIR/../scripts/usb_info.sh" >"$LOG_DIR/test_output.log" 2>&1
 if grep -q "User chose pendrive: sdb" "$LOG_DIR/usb_script.log"; then
   echo "Test passed: Pendrive sdb detected"
   log "Test passed: Pendrive sdb detected"
@@ -64,7 +70,18 @@ else
   exit 1
 fi
 
-# Test 4: Compare lsblk outputs
+# Test 4: Check USB_Registry.json creation
+echo "Testing USB_Registry.json creation..."
+if [[ -f "$REGISTRY_DIR/USB_Registry.json" && -f "/media/david/BOOT/USB_Registry.json" ]]; then
+  echo "Test passed: USB_Registry.json created"
+  log "Test passed: USB_Registry.json created"
+else
+  echo "Test failed: USB_Registry.json not created"
+  log "Test failed: USB_Registry.json not created"
+  exit 1
+fi
+
+# Test 5: Compare lsblk outputs
 echo "Testing lsblk output comparison..."
 if [[ -f "$LOG_DIR/lsblk_output_none.json" && -f "$LOG_DIR/lsblk_output_TEST1.json" ]]; then
   diff_output=$(diff "$LOG_DIR/lsblk_output_none.json" "$LOG_DIR/lsblk_output_TEST1.json")
@@ -86,4 +103,4 @@ fi
 echo "All tests passed!"
 log "All tests passed"
 
-# End of test_usb_info.sh
+# End of script
