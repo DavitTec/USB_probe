@@ -38,13 +38,20 @@ sudo ./scripts/usb_info.sh
 ## Development
 
 ```bash
-./scripts/main.sh lint    # Run shellcheck and prettier
-./scripts/main.sh format  # Format code
-./scripts/main.sh test    # Run tests
-./scripts/main.sh run     # Run usb_info.sh
-./scripts/main.sh commit  # Commit with conventional changelog
-./scripts/main.sh release # Tag and push release
+pnpm main lint    # Run shellcheck and prettier
+pnpm main format  # Format code
+pnpm main test    # Run tests
+pnpm main run     # Run usb_info.sh
+pnpm main commit  # Commit with conventional changelog
+pnpm main release # Tag and push release  or
+# note "main" is optional
+pnpm release # Tag and push release  or
+pnpm main # provides help or usage
 ```
+
+## TODO
+
+1. Provide help menu in main.sh
 
 ## License
 

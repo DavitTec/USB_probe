@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "main": "exec scripts/main.sh",
     "lint": "shellcheck scripts/*.sh && prettier --check .",
     "format": "prettier --write .",
     "test": "bash tests/test_usb_info.sh",
