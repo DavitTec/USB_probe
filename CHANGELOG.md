@@ -24,6 +24,9 @@
 
 
 
+# Changelog
+
+
 ## 0.0.1 (2025-07-08)
 
 
@@ -44,6 +47,3 @@
 * adding test1 test_usb_info.sh v0.1 ([b6e1d86](https://github.com/davittec/usb-probe/commit/b6e1d86ce70294b7db31df02c7cbc30907dd4ef8))
 * update package.json ([ebf6149](https://github.com/davittec/usb-probe/commit/ebf6149cb06f8452a7fb491bc32a04362c1d285b))
 * update package.json and packages ([5228d5b](https://github.com/davittec/usb-probe/commit/5228d5bff549b701566bc6376ed2f49b476fc58f))
-
-
-
