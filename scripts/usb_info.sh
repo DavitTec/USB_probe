@@ -1,6 +1,6 @@
 #!/bin/bash
 # usb_info.sh
-# version 0.11
+# version 0.12
 # Detects USB ports, gathers pendrive info, creates USB_Registry.json
 # Requires sudo for lsusb, lsblk, blkid, and file operations
 
@@ -108,7 +108,7 @@ prompt_remove_usb() {
   read -r
   # Unmount any USB devices
   local mounts
-  mounts=$(lsblk -J 2>/dev/null | jq -r '.blockdevices[] | select(.type=="disk" and .name | test("^sd[a-z]+$")) | .children[]?.mountpoint // empty' 2>/dev/null | grep -v null)
+  mounts=$(lsblk -J -o NAME,TYPE,MOUNTPOINT,RM 2>/dev/null | jq -r '.blockdevices[] | select(.type=="disk" and .rm==true) | .children[]?.mountpoint // empty' 2>/dev/null | grep -v null)
   if [[ -n "$mounts" ]]; then
     while IFS= read -r mount; do
       if ! umount "$mount" 2>/dev/null; then
@@ -121,7 +121,7 @@ prompt_remove_usb() {
     done <<<"$mounts"
   fi
   # Save lsblk output (no pendrives)
-  lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID >"$LSBLK_NONE" 2>/dev/null
+  lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID,RM >"$LSBLK_NONE" 2>/dev/null
   log "INFO" "Saved lsblk output (no pendrives) to $LSBLK_NONE"
   log "INFO" "USB removal prompt completed"
 }
@@ -133,7 +133,7 @@ create_baseline_registry() {
   local usb_info
   usb_info=$(lsusb -v 2>/dev/null)
   local lsblk_info
-  lsblk_info=$(lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID 2>/dev/null)
+  lsblk_info=$(lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID,RM 2>/dev/null)
   local blkid_info
   blkid_info=$(blkid 2>/dev/null)
   local baseline
@@ -142,7 +142,7 @@ create_baseline_registry() {
   # shellcheck disable=SC2181
   if [[ $? -ne 0 ]]; then
     feedback "ERROR: Failed to create baseline JSON."
-    log "ERROR" "Failed to create baseline JSON: usb=$usb_info, lsblk=$lsblk_info, blkid=$blkid_info"
+    log "ERROR" "Failed to create baseline JSON: lsblk=$lsblk_info"
     exit 1
   fi
   if ! echo "$baseline" >"$TEMP_REGISTRY"; then
@@ -150,7 +150,7 @@ create_baseline_registry() {
     log "ERROR" "Cannot write to $TEMP_REGISTRY"
     exit 1
   fi
-  log "INFO" "Baseline registry created: $baseline"
+  log "INFO" "Baseline registry created"
 }
 
 # Prompt user to reattach USB pendrives
@@ -159,7 +159,7 @@ prompt_reattach_usb() {
   log "INFO" "Prompting user to reattach USB pendrives"
   read -r
   # Save lsblk output (with pendrives)
-  lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID >"$LSBLK_TEST" 2>/dev/null
+  lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID,RM >"$LSBLK_TEST" 2>/dev/null
   log "INFO" "Saved lsblk output (with pendrives) to $LSBLK_TEST"
 }
 
@@ -168,7 +168,7 @@ gather_pendrive_info() {
   feedback "Gathering pendrive information..."
   log "INFO" "Starting pendrive info collection"
   local lsblk_output
-  lsblk_output=$(lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID 2>/dev/null)
+  lsblk_output=$(lsblk -J -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT,UUID,RM 2>/dev/null)
   log "INFO" "lsblk output: $lsblk_output"
   if [[ -z "$lsblk_output" ]]; then
     feedback "ERROR: lsblk output is empty."
@@ -176,29 +176,19 @@ gather_pendrive_info() {
     exit 1
   fi
   local pendrives
-  pendrives=$(echo "$lsblk_output" | jq '[.blockdevices[] | select(.type=="disk" and .name | test("^sd[b-z]+$")) | {name, size, type, fstype, label, mountpoint, uuid, children: (.children // [] | map(select(.type=="part") | {name, size, type, fstype, label, mountpoint, uuid}))}]')
+  pendrives=$(echo "$lsblk_output" | jq '[.blockdevices[] | select(.type=="disk" and .rm==true) | {name, size, type, fstype, label, mountpoint, uuid, rm, children: (.children // [] | map(select(.type=="part") | {name, size, type, fstype, label, mountpoint, uuid}))}]')
+
   # shellcheck disable=SC2181
   if [[ $? -ne 0 ]]; then
+    # shellcheck disable=SC2319
     feedback "ERROR: Failed to parse lsblk output with jq: $?"
     log "ERROR" "Failed to parse lsblk output: $lsblk_output"
     exit 1
   fi
   if [[ -z "$pendrives" || "$pendrives" == "[]" ]]; then
-    feedback "No USB pendrives found. Checking all disks..."
-    log "INFO" "No USB pendrives found, checking all disks"
-    pendrives=$(echo "$lsblk_output" | jq '[.blockdevices[] | select(.type=="disk" and .rm==true) | {name, size, type, fstype, label, mountpoint, uuid, children: (.children // [] | map(select(.type=="part") | {name, size, type, fstype, label, mountpoint, uuid}))}]')
-    # shellcheck disable=SC2181
-    if [[ $? -ne 0 ]]; then
-      # shellcheck disable=SC2319
-      feedback "ERROR: Failed to parse lsblk output for removable disks: $?"
-      log "ERROR" "Failed to parse lsblk output for removable disks: $lsblk_output"
-      exit 1
-    fi
-    if [[ -z "$pendrives" || "$pendrives" == "[]" ]]; then
-      feedback "No removable pendrives found."
-      log "ERROR" "No removable pendrives detected"
-      exit 1
-    fi
+    feedback "No USB pendrives found."
+    log "ERROR" "No USB pendrives detected"
+    exit 1
   fi
   local count
   count=$(echo "$pendrives" | jq 'length')
@@ -281,14 +271,6 @@ check_usb_speed() {
   else
     feedback "WARNING: Pendrive not on high-speed USB (3.0+). Consider moving to a USB 3.0+ port."
     log "WARNING" "Pendrive not on high-speed USB: $usb_info"
-    local devices
-    devices=$(echo "$pendrive_info" | jq -r '.lsblk[].name' 2>/dev/null)
-    if [[ -n "$devices" ]]; then
-      feedback "Detected devices: $devices"
-      feedback "Please move pendrives to USB 3.0+ ports and re-run the script."
-      log "INFO" "Prompted user to move pendrives: $devices"
-      exit 1
-    fi
   fi
 }
 
@@ -297,7 +279,7 @@ choose_pendrive() {
   local pendrive_info="$1"
   feedback "Available pendrives:"
   local devices
-  devices=$(echo "$pendrive_info" | jq -r '.lsblk[] | "\(.name) (\(.size), \(.fstype // "none"}, \(.mountpoint // "not mounted"})"' 2>/dev/null)
+  devices=$(echo "$pendrive_info" | jq -r '.lsblk[] | "\(.name) (\(.size), \(.fstype // "none"}, \(.mountpoint // "not mounted"}, \(.children[]?.mountpoint // "no partitions"})"' 2>/dev/null)
   if [[ -z "$devices" ]]; then
     feedback "No valid pendrive names found."
     log "ERROR" "No valid pendrive names found: $pendrive_info"
@@ -413,5 +395,3 @@ main() {
 
 # Run main
 main "$@"
-
-# End of script
