@@ -21,16 +21,18 @@ else
   exit 1
 fi
 
-if [ "$(id -u)" != "0" ]; then
-  log "ERROR: This script must be run as root (sudo)."
-  exit 1
-fi
+# if [ "$(id -u)" != "0" ]; then
+#   log "ERROR: This script must be run as root (sudo)."
+#   exit 1
+# fi
 
 update_changelog() {
   local temp_changelog
-  temp_changelog=$(mktemp)
+  #temp_changelog=$(mktemp)
+  temp_changelog="change1.tmp"
   log "Generating changelog to $temp_changelog..."
-  if ! conventional-changelog -p angular -i CHANGELOG.md --outfile "$temp_changelog"; then
+  # Ensure conventional-changelog is installed
+  if ! { conventional-changelog -p angular -i CHANGELOG.md --outfile "$temp_changelog"; }; then
     log "ERROR: Failed to generate changelog."
     rm -f "$temp_changelog"
     exit 1
