@@ -4,7 +4,7 @@ A standalone Bash utility for probing USB ports and pendrives, creating a `USB_R
 
 > [!WARNING]
 >
-> This project in still in development and a alpha phase release, **Version 0.1.0**
+> This project in still in development and a alpha phase release, **Version 0.1**
 
 ## Features
 
