@@ -1,5 +1,28 @@
 # Changelog
 
+
+## [0.1.1](https://github.com/davittec/usb-probe/compare/v0.1.0...v0.1.1) (2025-07-09)
+
+
+### Bug Fixes
+
+*  update changelog with new markdownlint rule ([bcae97a](https://github.com/davittec/usb-probe/commit/bcae97a4e7624efedc4bec07dc5ec2cc4af6796e))
+* changelog ([c272659](https://github.com/davittec/usb-probe/commit/c272659f558b863de64b8b9f7bb6e1e8d3400ae2))
+
+
+
+## [0.1.1](https://github.com/davittec/usb-probe/compare/v0.1.0...v0.1.1) (2025-07-09)
+
+
+### Bug Fixes
+
+*  update changelog with new markdownlint rule ([bcae97a](https://github.com/davittec/usb-probe/commit/bcae97a4e7624efedc4bec07dc5ec2cc4af6796e))
+* changelog ([c272659](https://github.com/davittec/usb-probe/commit/c272659f558b863de64b8b9f7bb6e1e8d3400ae2))
+
+
+
+# Changelog
+
 ## [0.1.2](https://github.com/davittec/usb-probe/compare/v0.1.0...v0.1.2) (2025-07-09)
 
 
