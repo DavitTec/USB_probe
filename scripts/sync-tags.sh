@@ -36,8 +36,8 @@ git ls-remote --tags origin
 # Optional: Regenerate changelog (uncomment if using git-chglog)
 echo "Regenerating changelog..."
 # git-chglog --output CHANGELOG.md
-pnpm conventional-changelog -p angular -i CHANGELOG.md -s
-pnpm changelog:fix
+# pnpm conventional-changelog -p angular -i CHANGELOG.md -s
+# pnpm changelog:fix
 
 git add CHANGELOG.md
 git commit -m "Update changelog to sync with tags" || true
