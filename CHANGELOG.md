@@ -1,3 +1,6 @@
+# Changelog
+
+
 # CHANGELOG
 
 ## [0.1.0](https://github.com/davittec/usb-probe/compare/v0.0.2...v0.1.0) (2025-07-09)
