@@ -6,12 +6,6 @@
 
 - changelog ([b68ad1d](https://github.com/davittec/usb-probe/commit/b68ad1da0d652f30eb873c0a5b362d54379075a1))
 
-## [0.1.7](https://github.com/davittec/usb-probe/compare/v0.1.6...v0.1.7) (2025-07-09)
-
-### Bug Fixes
-
-- changelog ([b68ad1d](https://github.com/davittec/usb-probe/commit/b68ad1da0d652f30eb873c0a5b362d54379075a1))
-
 ## [0.1.6](https://github.com/davittec/usb-probe/compare/v0.1.5...v0.1.6) (2025-07-09)
 
 ### Bug Fixes
