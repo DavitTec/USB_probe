@@ -1,11 +1,6 @@
 # Changelog
 
-
 ## [0.1.4](https://github.com/davittec/usb-probe/compare/v0.1.3...v0.1.4) (2025-07-09)
-
-
-
-# Changelog
 
 ## [0.1.3](https://github.com/davittec/usb-probe/compare/v0.1.0...v0.1.3) (2025-07-09)
 
