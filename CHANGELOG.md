@@ -1,7 +1,10 @@
 # Changelog
 
 
-# [0.9.0](https://github.com/davittec/usb-probe/compare/v0.8.0...v0.9.0) (2025-07-09)
+# Changelog
+
+
+## [0.9.0](https://github.com/davittec/usb-probe/compare/v0.8.0...v0.9.0) (2025-07-09)
 
 
 ### Bug Fixes
@@ -10,15 +13,15 @@
 
 
 
-# [0.8.0](https://github.com/davittec/usb-probe/compare/v0.7.0...v0.8.0) (2025-07-09)
+## [0.8.0](https://github.com/davittec/usb-probe/compare/v0.7.0...v0.8.0) (2025-07-09)
 
 
 
-# [0.7.0](https://github.com/davittec/usb-probe/compare/v0.6.0...v0.7.0) (2025-07-09)
+## [0.7.0](https://github.com/davittec/usb-probe/compare/v0.6.0...v0.7.0) (2025-07-09)
 
 
 
-# [0.6.0](https://github.com/davittec/usb-probe/compare/v0.5.0...v0.6.0) (2025-07-09)
+## [0.6.0](https://github.com/davittec/usb-probe/compare/v0.5.0...v0.6.0) (2025-07-09)
 
 
 ### Bug Fixes
