@@ -1,6 +1,6 @@
 #!/bin/bash
 # release.sh
-# Version: 0.2.3
+# Version: 0.2.4
 # Purpose: Manage release process with version bump and changelog update
 
 # Resolve script directory for relative paths

@@ -19,5 +19,14 @@
     "**/.git/**": true,
     "**/node_modules/**": true
   },
-  "prettier.prettierPath": "./node_modules/prettier"
+  "prettier.prettierPath": "./node_modules/prettier",
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "markdownlint.run": "onSave",
+  "markdownlint.config": {
+    "MD013": false,
+    "MD031": true
+  }
 }
