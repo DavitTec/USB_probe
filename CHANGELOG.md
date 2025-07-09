@@ -1,8 +1,21 @@
 # CHANGELOG
 
-## [0.0.2](https://github.com/davittec/usb-probe/compare/5228d5bff549b701566bc6376ed2f49b476fc58f...v0.0.2) (2025-07-08)
+## [0.1.0](https://github.com/davittec/usb-probe/compare/v0.0.2...v0.1.0) (2025-07-09)
 
-## 0.0.1 (2025-07-08)
+### Bug Fixes
+
+- **test_usb_info.sh:** unexpected EOF while looking for matching `"' ([4c5d0fb](https://github.com/davittec/usb-probe/commit/4c5d0fb51a7c1d11ccb8fbc78507a0b28678f2fd))
+- test_usb_simple.sh v0.5 and usb_info.sh v0.12 ([476acd6](https://github.com/davittec/usb-probe/commit/476acd624d40e413ca1ef59ef547060ef409894f))
+- **test_usb_simple.sh:** set USER variable ([815fc94](https://github.com/davittec/usb-probe/commit/815fc94cf08a9ce4d744697ce9d7daa70a8604c2))
+- **usb_info.sh:** fix parsing errors and update ([90b4ef0](https://github.com/davittec/usb-probe/commit/90b4ef0bb373eff5c6500fb350c6cad1107e87f2))
+- **usb_info.sh:** update usb_info.sh to incl diffs ([bb5c0d1](https://github.com/davittec/usb-probe/commit/bb5c0d16bebe436a2ae3ef7b6743601f74e65b6a))
+
+### Features
+
+- **main.sh:** add test simple to tes1 and test_usb_info to test2 ([ac4ab2f](https://github.com/davittec/usb-probe/commit/ac4ab2f97eb89825129ca89fcd0a4d17767d541e))
+- **readme.md:** fix and add markdownlint and prettier fixes ([177c736](https://github.com/davittec/usb-probe/commit/177c736c6e87ee3635e7926b43c076ef0568500a))
+
+## [0.0.2](https://github.com/davittec/usb-probe/compare/5228d5bff549b701566bc6376ed2f49b476fc58f...v0.0.2) (2025-07-08)
 
 ### Bug Fixes
 
