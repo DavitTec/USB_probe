@@ -5,6 +5,7 @@ A standalone Bash utility for probing USB ports and pendrives, creating a `USB_R
 > [!WARNING]
 >
 > This project in still in development and a alpha phase release, **Version 0.1**
+> time tió review
 
 ## Features
 
@@ -80,14 +81,12 @@ pnpm main # provides help or usage
 #### Test the Script
 
 1. Run with pendrive attached:
-
    - ```bash
      cd ./usb_probe
      sudo ./scripts/main.sh test1 #or pnpm main test1
      ```
 
 2. Inspect Outputs
-
    - ```bash
      cat ./usb_probe/logs/test_usb_simple.log
      cat ./usb_probe/logs/usb_registry.json
