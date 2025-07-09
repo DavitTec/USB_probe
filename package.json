@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "main": "exec scripts/main.sh",
-    "lint": "shellcheck scripts/*.sh && prettier --check .",
-    "format": "prettier --write .",
+    "lint:sh": "shellcheck scripts/*.sh",
+    "lint:md": "markdownlint . ",
+    "format": "prettier --write . && markdownlint --fix .",
     "test": "bash tests/test_usb_info.sh",
     "commit": "cz",
     "prepare": "husky",
@@ -32,6 +33,7 @@
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.1.7",
+    "markdownlint-cli": "^0.45.0",
     "prettier": "^3.6.2",
     "shellcheck": "^3.1.0"
   },

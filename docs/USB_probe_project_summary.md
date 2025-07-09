@@ -2,7 +2,12 @@
 
 ## Overview
 
-The `USB_probe` project, hosted at `https://github.com/DavitTec/USB_probe`, aims to develop a Bash script to detect and report the state of USB storage devices (`sd[a-f]`) on Linux systems (Linux Mint 21.3, Ubuntu 22.04-based). The script queries device attachment status (`true`/`false`), identifies boot drives, and collects metadata (e.g., size, filesystem, mount points, USB protocol). The project is located at `/opt/davit/development/usb_probe` and uses a monorepo structure with scripts, tests, and logs.
+The `USB_probe` project, hosted at `https://github.com/DavitTec/USB_probe`, aims to develop a Bash script to
+detect and report the state of USB storage devices (`sd[a-f]`) on Linux systems (Linux Mint 21.3,
+Ubuntu 22.04-based). The script queries device attachment status (`true`/`false`), identifies boot drives,
+and collects metadata (e.g., size, filesystem, mount points, USB protocol). The project is located
+at `/opt/davit/development/usb_probe` and uses a monorepo structure
+with scripts, tests, and logs.
 
 ## Goals
 
@@ -36,8 +41,10 @@ The `USB_probe` project, hosted at `https://github.com/DavitTec/USB_probe`, aims
   - Failed to create `USB_Registry.json` due to empty `pendrives` array.
   - Complex logic for comparing `lsblk` outputs and checking USB speed.
 - **Logs**:
-  - `usb_script.log` (2025-07-08): Showed `ERROR: Failed to parse lsblk output with jq: 0`, `No valid pendrive names found`, and `Pendrive not mounted: Available`.
-  - `lsblk_output_TEST1.json`: Confirmed `/dev/sdb` (14.8G, `058f:6387`, USB 2.0) with `/dev/sdb1` (4G, vfat, `/media/david/BOOT`).
+  - `usb_script.log` (2025-07-08): Showed `ERROR: Failed to parse lsblk output with jq: 0`,
+  - `No valid pendrive names found`, and `Pendrive not mounted: Available`.
+  - `lsblk_output_TEST1.json`: Confirmed `/dev/sdb` (14.8G, `058f:6387`, USB 2.0) with `/dev/sdb1`
+  - (4G, vfat, `/media/david/BOOT`).
   - `usb-devices.4.txt`: Verified pendrive presence on Bus 01 (480Mbps).
 
 ### Simplified Approach (`test_usb_simple.sh`)
@@ -47,7 +54,25 @@ The `USB_probe` project, hosted at `https://github.com/DavitTec/USB_probe`, aims
   - Adopted a reliable `jq` command to detect `sd[a-f]` attachment status:
 
     ```bash
-    lsblk -J -o NAME | jq -r '. as $input | { "device": "test", "slots": 4, "blockdevices": ([.blockdevices[] | select(.name | startswith("sd")) | { "name": .name, "attached": true }] + (["sda","sdb","sdc","sdd","sde","sdf"] | map(select(. as $name | [$input.blockdevices[].name] | index($name) | not)) | map({ "name": ., "attached": false })) | sort_by(.name)) }'
+    lsblk -J -o NAME | jq -r '. as $input |
+    { "device": "test", "slots": 4, "blockdevices":
+       ([.blockdevices[] |
+         select(.name |
+         startswith("sd")) |
+          {
+           "name": .name, "attached": true
+          }]
+    + (["sda","sdb","sdc","sdd","sde","sdf"] |
+       map(select(. as $name |
+       [$input.blockdevices[].name] |
+       index($name) |
+       not)
+       ) |
+     map({
+          "name": ., "attached": false
+         })) |
+        sort_by(.name))
+    }'
     ```
 
   - Used `STORAGE_DEVICES` array for flexibility.

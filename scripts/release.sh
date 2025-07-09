@@ -1,6 +1,6 @@
 #!/bin/bash
 # release.sh
-# Version: 0.2.2
+# Version: 0.2.3
 # Purpose: Manage release process with version bump and changelog update
 
 # Resolve script directory for relative paths
@@ -88,6 +88,13 @@ release() {
   echo -e "# CHANGELOG\n\n" >CHANGELOG.md
   cat "$temp_changelog" >>CHANGELOG.md
   rm -f "$temp_changelog"
+
+  # Format Markdown files to ensure consistency
+  log "Running markdownlint to fix formatting..."
+  pnpm format || {
+    log "ERROR: Markdown formatting failed."
+    exit 1
+  }
 
   # Commit changelog if changed
   if git diff --quiet CHANGELOG.md; then
