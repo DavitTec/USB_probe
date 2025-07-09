@@ -1,6 +1,6 @@
 #!/bin/bash
 # release.sh
-# Version: 0.2.4
+# Version: 0.2.7
 # Purpose: Manage release process with version bump and changelog update
 
 # Resolve script directory for relative paths
@@ -30,7 +30,7 @@ fi
 # fi
 
 release() {
-  local choice release_type temp_changelog
+  local choice release_type
   # Check for modified or staged changes
   if [ -n "$(git status --porcelain)" ]; then
     log "Changes detected. Staging and committing with commitizen..."
@@ -61,38 +61,26 @@ release() {
     exit 1
   fi
 
-  # Bump version
+  # Bump version and create tag
   pnpm version "$release_type" || {
     log "ERROR: Version bump failed."
     exit 1
   }
 
   # Fetch latest tags
-  git fetch --tags
+  git fetch --tags --force
 
   # Generate changelog
-  temp_changelog=$(mktemp)
-  log "Generating changelog to $temp_changelog..."
-  if ! conventional-changelog -p angular -r 0 --outfile "$temp_changelog"; then
+  log "Generating changelog..."
+  if ! pnpm changelog:first; then
     log "ERROR: Changelog generation failed. Restoring previous CHANGELOG.md..."
     git checkout -- CHANGELOG.md
-    rm -f "$temp_changelog"
     exit 1
   fi
 
-  # Replace asterisks with dashes
-  sed -i -E 's/^\* ([^\*])/- \1/g' "$temp_changelog"
-  sed -i -E 's/^\* \*\*([^\*]+)\*\*/- \*\*\1\*\*/g' "$temp_changelog"
-
-  # Update changelog
-  echo -e "# CHANGELOG\n\n" >CHANGELOG.md
-  cat "$temp_changelog" >>CHANGELOG.md
-  rm -f "$temp_changelog"
-
-  # Format Markdown files to ensure consistency
-  log "Running markdownlint to fix formatting..."
-  pnpm format || {
-    log "ERROR: Markdown formatting failed."
+  # Fix changelog formatting
+  pnpm changelog:fix || {
+    log "ERROR: Changelog fix failed."
     exit 1
   }
 
@@ -101,10 +89,23 @@ release() {
     log "No changes to CHANGELOG.md, skipping commit..."
   else
     git add CHANGELOG.md
-    HUSKY=0 git commit -m "chore(release): update changelog"
+    git commit -m "chore(release): update changelog"
   fi
 
-  git push --follow-tags
+  # Validate changelog URLs
+  log "Validating changelog URLs..."
+  grep -o 'https://github.com/DavitTec/USB_probe/compare/[^)]*' CHANGELOG.md | while read -r url; do
+    if curl --output /dev/null --silent --head --fail "$url"; then
+      log "URL valid: $url"
+    else
+      log "ERROR: URL invalid: $url"
+      exit 1
+    fi
+  done
+
+  # Push changes and tags
+  git push origin master
+  git push origin --tags
   log "Release $release_type completed!"
 }
 

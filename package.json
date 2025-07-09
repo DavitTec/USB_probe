@@ -41,5 +41,11 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "conventional-changelog": {
+    "preset": "angular",
+    "releaseCount": 0,
+    "tagPrefix": "v",
+    "compareUrlFormat": "https://github.com/DavitTec/USB_probe/compare/{{previousTag}}...{{currentTag}}"
   }
 }
