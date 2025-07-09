@@ -105,7 +105,7 @@ check_dependencies() {
 prompt_remove_usb() {
   feedback "Please remove all USB pendrives and press Enter to continue..."
   log "INFO" "Prompting user to remove USB pendrives"
-  read -r
+  # read -r
   # Unmount any USB devices
   local mounts
   mounts=$(lsblk -J -o NAME,TYPE,MOUNTPOINT,RM 2>/dev/null | jq -r '.blockdevices[] | select(.type=="disk" and .rm==true) | .children[]?.mountpoint // empty' 2>/dev/null | grep -v null)
