@@ -1,6 +1,6 @@
 #!/bin/bash
 # test_usb_simple.sh
-# version 0.5
+# version 0.6
 # Detects attachment status of sd[a-f] devices and USB protocol without user prompts
 # Requires sudo for lsblk, usb-devices, and file operations
 
@@ -19,6 +19,9 @@ else
   exit 1
 fi
 
+# Get $USER from environment variables
+USER="${USER:-$(whoami)}"
+
 # Define files
 LOG_FILE="$LOG_DIR/test_usb_simple.log"
 OUTPUT_JSON="$LOG_DIR/usb_registry.json"
@@ -35,7 +38,7 @@ for dir in "$LOG_DIR" "$REGISTRY_DIR"; do
       echo "ERROR: Cannot set permissions on $dir"
       exit 1
     fi
-    if ! chown david:david "$dir"; then
+    if ! chown "$USER:$USER" "$dir"; then
       echo "ERROR: Cannot set ownership on $dir"
       exit 1
     fi
@@ -58,7 +61,7 @@ else
     exit 1
   fi
 fi
-if ! chown david:david "$LOG_FILE" 2>/dev/null; then
+if ! chown "$USER:$USER" "$LOG_FILE" 2>/dev/null; then
   echo "ERROR: Cannot set ownership on $LOG_FILE"
   exit 1
 fi
@@ -202,7 +205,7 @@ detect_usb_devices() {
       feedback "WARNING: Cannot set permissions on $file"
       log "WARNING" "Cannot set permissions on $file"
     fi
-    if ! chown david:david "$file" 2>/dev/null; then
+    if ! chown "$USER:$USER" "$file" 2>/dev/null; then
       feedback "WARNING: Cannot set ownership on $file"
       log "WARNING" "Cannot set ownership on $file"
     fi
