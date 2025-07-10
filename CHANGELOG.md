@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [0.10.3](https://github.com/davittec/usb_probe/compare/v0.10.2...v0.10.3) (2025-07-10)
+
+### Bug Fixes
+
+- disables wrap ([38cdcd0](https://github.com/davittec/usb_probe/commit/38cdcd048bd64147f4f5dc900a0b3b97b0ece150))
+- formating ([0c50085](https://github.com/davittec/usb_probe/commit/0c50085bde73d3464a1ffefdd79dfb8ccedb5e71))
+- issues_changelog.md ([cd42614](https://github.com/davittec/usb_probe/commit/cd426144ae88f80571ef3ab081481847fee33075))
+
+### Features
+
+- **wrap:** added wrap_md.sh v0.1 to maintain wrap limit ([72007d3](https://github.com/davittec/usb_probe/commit/72007d31864b7ea52e7fe4aac02f077083b9e14f))
+
 ## [0.10.2](https://github.com/davittec/usb_probe/compare/v0.10.1...v0.10.2) (2025-07-10)
 
 ## [0.10.1](https://github.com/davittec/usb_probe/compare/v0.10.0...v0.10.1) (2025-07-10)
