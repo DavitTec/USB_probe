@@ -1,3 +1,4 @@
 #pnpm test
+pnpm wrap:md
 pnpm format
 pnpm lint:sh

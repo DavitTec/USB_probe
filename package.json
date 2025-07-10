@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "main": "exec scripts/main.sh",
+    "wrap:md": "exec scripts/wrap_md.sh",
     "lint:sh": "shellcheck scripts/*.sh",
     "lint:md": "markdownlint . ",
     "format": "prettier --write . && markdownlint --fix .",
