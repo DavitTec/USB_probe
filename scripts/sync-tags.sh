@@ -1,6 +1,6 @@
 #!/bin/bash
 # sync-tags.sh
-# Version: 0.0.13
+# Version: 0.0.14
 # Purpose: Sync local tags, branch, and changelog with remote GitHub repository
 
 # Exit on error
@@ -48,7 +48,8 @@ git tag -a v0.7.0 c3b955c -m "Release v0.7.0"
 git tag -a v0.8.0 7670625 -m "Release v0.8.0"
 git tag -a v0.9.0 7d6dfc0 -m "Release v0.9.0"
 git tag -a v0.10.0 ec3258e -m "Release v0.10.0"
-git push origin v0.1.0 v0.2.0 v0.3.0 v0.4.0 v0.5.0 v0.6.0 v0.7.0 v0.8.0 v0.9.0 v0.10.0
+git tag -a v0.10.1 eee2366 -m "Release v0.10.1"
+git push origin v0.1.0 v0.2.0 v0.3.0 v0.4.0 v0.5.0 v0.6.0 v0.7.0 v0.8.0 v0.9.0 v0.10.0 v0.10.1
 
 # Verify tags
 echo "Local tags:"
@@ -118,11 +119,11 @@ fi
 
 # Validate release URLs
 echo "Validating release URLs..."
-grep -o 'https://github.com/DavitTec/usb_probe/releases/tag/[^)]*' CHANGELOG.md | while read -r url; do
+grep -o 'https://github.com/DavitTec/usb_probe/\(compare\|releases/tag\)/[^)]*' CHANGELOG.md | while read -r url; do
   if curl --output /dev/null --silent --head --fail "$url"; then
     echo "URL valid: $url"
   else
-    echo "ERROR: Release URL invalid: $url"
+    echo "ERROR: URL invalid: $url"
     exit 1
   fi
 done

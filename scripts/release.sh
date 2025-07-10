@@ -1,6 +1,6 @@
 #!/bin/bash
 # release.sh
-# Version: 0.2.11
+# Version: 0.2.14
 # Purpose: Manage release process with version bump and changelog update
 
 # Resolve script directory for relative paths
@@ -89,7 +89,7 @@ release() {
   "MD003": { "style": "atx" },
   "MD004": { "style": "dash" },
   "MD007": { "indent": 2 },
-  "MD013": { "line_length": 120 },
+  "MD013": { "line_length": 150 },
   "MD024": false,
   "MD031": true,
   "MD032": true,
@@ -99,10 +99,21 @@ release() {
 }
 EOL
 
-  pnpm run prettier --write CHANGELOG.md || {
-    log "ERROR: Prettier formatting failed."
+  pnpm format || {
+    log "ERROR: Formatting failed."
     exit 1
   }
+
+  # Validate commit URLs
+  log "Validating commit URLs..."
+  grep -o 'https://github.com/DavitTec/usb_probe/commit/[^)]*' CHANGELOG.md | while read -r url; do
+    if curl --output /dev/null --silent --head --fail "$url"; then
+      log "URL valid: $url"
+    else
+      log "ERROR: Commit URL invalid: $url"
+      exit 1
+    fi
+  done
 
   # Commit changelog and config if changed
   if git diff --quiet CHANGELOG.md .markdownlint.json; then
@@ -111,17 +122,6 @@ EOL
     git add CHANGELOG.md .markdownlint.json
     git commit -m "chore(release): update changelog and markdownlint config"
   fi
-
-  # Validate changelog URLs
-  log "Validating changelog URLs..."
-  grep -o 'https://github.com/DavitTec/USB_probe/releases/tag/[^)]*' CHANGELOG.md | while read -r url; do
-    if curl --output /dev/null --silent --head --fail "$url"; then
-      log "URL valid: $url"
-    else
-      log "ERROR: URL invalid: $url"
-      exit 1
-    fi
-  done
 
   # Push changes and tags
   git push origin master
