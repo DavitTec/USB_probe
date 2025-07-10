@@ -26,7 +26,8 @@ with scripts, tests, and logs.
   - `scripts/usb_info.sh`: Original script to detect USB devices and create `USB_Registry.json` (currently problematic).
   - `tests/test_usb_simple.sh`: Simplified test script to detect `sd[a-f]` attachment status.
   - `.env`: Environment variables (`BASE_DIR`, `SCRIPT_DIR`, `LOG_DIR`, `REGISTRY_DIR`).
-  - `logs/`: Stores logs (`test_usb_simple.log`, `usb_registry.json`) and previous outputs (`lsblk_output_none.json`, `lsblk_output_TEST1.json`).
+  - `logs/`: Stores logs (`test_usb_simple.log`, `usb_registry.json`) and previous outputs (`lsblk_output_none.json`,
+    `lsblk_output_TEST1.json`).
   - `.davit/`: Stores `usb_registry.json`.
 - **Dependencies**: `jq`, `lsblk`, `usb-devices` (from `usbutils`).
 

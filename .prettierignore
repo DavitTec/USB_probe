@@ -1,0 +1,16 @@
+.cache
+.next
+build
+coverage
+dist
+next-env.d.ts
+next.config.ts
+node_modules
+out
+package-lock.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+public
+yarn.lock
+archive
+archives
