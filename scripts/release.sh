@@ -1,6 +1,6 @@
 #!/bin/bash
 # release.sh
-# Version: 0.2.7
+# Version: 0.2.11
 # Purpose: Manage release process with version bump and changelog update
 
 # Resolve script directory for relative paths
@@ -23,11 +23,6 @@ else
   echo "ERROR: logging.sh script not found."
   exit 1
 fi
-
-# if [ "$(id -u)" != "0" ]; then
-#   log "ERROR: This script must be run as root (sudo)."
-#   exit 1
-# fi
 
 release() {
   local choice release_type
@@ -84,17 +79,42 @@ release() {
     exit 1
   }
 
-  # Commit changelog if changed
-  if git diff --quiet CHANGELOG.md; then
-    log "No changes to CHANGELOG.md, skipping commit..."
+  # Update markdownlint config
+  log "Updating markdownlint config..."
+  cat >.markdownlint.json <<EOL
+{
+  "default": true,
+  "MD025": { "level": 2 },
+  "MD001": false,
+  "MD003": { "style": "atx" },
+  "MD004": { "style": "dash" },
+  "MD007": { "indent": 2 },
+  "MD013": { "line_length": 120 },
+  "MD024": false,
+  "MD031": true,
+  "MD032": true,
+  "MD046": { "style": "fenced" },
+  "no-hard-tabs": false,
+  "whitespace": false
+}
+EOL
+
+  pnpm run prettier --write CHANGELOG.md || {
+    log "ERROR: Prettier formatting failed."
+    exit 1
+  }
+
+  # Commit changelog and config if changed
+  if git diff --quiet CHANGELOG.md .markdownlint.json; then
+    log "No changes to CHANGELOG.md or .markdownlint.json, skipping commit..."
   else
-    git add CHANGELOG.md
-    git commit -m "chore(release): update changelog"
+    git add CHANGELOG.md .markdownlint.json
+    git commit -m "chore(release): update changelog and markdownlint config"
   fi
 
   # Validate changelog URLs
   log "Validating changelog URLs..."
-  grep -o 'https://github.com/DavitTec/USB_probe/compare/[^)]*' CHANGELOG.md | while read -r url; do
+  grep -o 'https://github.com/DavitTec/USB_probe/releases/tag/[^)]*' CHANGELOG.md | while read -r url; do
     if curl --output /dev/null --silent --head --fail "$url"; then
       log "URL valid: $url"
     else
@@ -111,4 +131,4 @@ release() {
 
 release
 
-# end of script
+# End of script

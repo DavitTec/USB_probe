@@ -1,7 +1,7 @@
 #!/bin/bash
 # changelog-fix.sh
-# Version: 0.2.1
-# Purpose: Modify header of CHANGELOG.md and update version
+# Version: 0.2.5
+# Purpose: Format CHANGELOG.md and replace comparison URLs with release pages
 
 # Load environment variables
 if [ -f "./.env" ]; then
@@ -21,32 +21,27 @@ else
   exit 1
 fi
 
-# if [ "$(id -u)" != "0" ]; then
-#   log "ERROR: This script must be run as root (sudo)."
-#   exit 1
-# fi
+# Check if CHANGELOG.md exists
+if [ ! -f "CHANGELOG.md" ]; then
+  log "ERROR: CHANGELOG.md not found."
+  exit 1
+fi
 
-update_changelog() {
-  local temp_changelog
-  #temp_changelog=$(mktemp)
-  temp_changelog="change1.tmp"
-  log "Generating changelog to $temp_changelog..."
-  # Ensure conventional-changelog is installed
-  if ! { conventional-changelog -p angular -i CHANGELOG.md --outfile "$temp_changelog"; }; then
-    log "ERROR: Failed to generate changelog."
-    rm -f "$temp_changelog"
-    exit 1
-  fi
-  echo -e "# Changelog\n\n" >CHANGELOG.md
-  cat "$temp_changelog" >>CHANGELOG.md
-  rm -f "$temp_changelog"
-  log "Updated CHANGELOG.md."
-  git add CHANGELOG.md
-  HUSKY=0 git commit -m "chore(release): update changelog"
-  pnpm version patch
-  git push --follow-tags
+# Fix changelog formatting
+log "Fixing CHANGELOG.md formatting..."
+sed -i -E 's/^\* ([^\*])/- \1/g' CHANGELOG.md
+sed -i -E 's/^\* \*\*([^\*]+)\*\*/- \*\*\1\*\*/g' CHANGELOG.md
+
+# Replace comparison URLs with release pages
+log "Replacing comparison URLs with release pages..."
+sed -i 's|https://github.com/DavitTec/USB_probe/compare/\([^)]*\)|https://github.com/DavitTec/USB_probe/releases/tag/\1|g' CHANGELOG.md
+
+# Run prettier to format
+pnpm run prettier --write CHANGELOG.md || {
+  log "ERROR: Prettier formatting failed."
+  exit 1
 }
 
-update_changelog
+log "Changelog formatting complete."
 
-# end of script
+# End of script

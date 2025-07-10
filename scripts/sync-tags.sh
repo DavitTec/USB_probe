@@ -1,6 +1,6 @@
 #!/bin/bash
 # sync-tags.sh
-# Version: 0.0.6
+# Version: 0.0.10
 # Purpose: Sync local tags, branch, and changelog with remote GitHub repository
 
 # Exit on error
@@ -21,10 +21,6 @@ if [ -n "$(git status --porcelain)" ]; then
   git status
   exit 1
 fi
-
-# Delete all local tags
-echo "Deleting local tags..."
-git tag -l | xargs git tag -d || true
 
 # Fetch remote tags and branch
 echo "Fetching remote tags and branches..."
@@ -51,6 +47,26 @@ pnpm version "$LATEST_VERSION" --no-git-tag-version || {
   exit 1
 }
 
+# Update markdownlint config
+echo "Updating markdownlint config..."
+cat >.markdownlint.json <<EOL
+{
+  "default": true,
+  "MD025": { "level": 2 },
+  "MD001": false,
+  "MD003": { "style": "atx" },
+  "MD004": { "style": "dash" },
+  "MD007": { "indent": 2 },
+  "MD013": { "line_length": 120 },
+  "MD024": false,
+  "MD031": true,
+  "MD032": true,
+  "MD046": { "style": "fenced" },
+  "no-hard-tabs": false,
+  "whitespace": false
+}
+EOL
+
 # Regenerate changelog
 echo "Regenerating changelog..."
 pnpm changelog:first || {
@@ -61,13 +77,17 @@ pnpm changelog:fix || {
   echo "ERROR: Changelog fix failed."
   exit 1
 }
+pnpm run prettier --write CHANGELOG.md || {
+  echo "ERROR: Prettier formatting failed."
+  exit 1
+}
 
-# Commit changelog and package.json if changed
-if git diff --quiet CHANGELOG.md package.json; then
-  echo "No changes to CHANGELOG.md or package.json, skipping commit..."
+# Commit changelog, package.json, and markdownlint config if changed
+if git diff --quiet CHANGELOG.md package.json .markdownlint.json; then
+  echo "No changes to CHANGELOG.md, package.json, or .markdownlint.json, skipping commit..."
 else
-  git add CHANGELOG.md package.json
-  git commit -m "chore: sync changelog and version with tags" || true
+  git add CHANGELOG.md package.json .markdownlint.json
+  git commit -m "chore: sync changelog, version, and markdownlint config" || true
   git push origin master
 fi
 
@@ -80,7 +100,7 @@ fi
 
 # Validate changelog URLs
 echo "Validating changelog URLs..."
-grep -o 'https://github.com/DavitTec/USB_probe/compare/[^)]*' CHANGELOG.md | while read -r url; do
+grep -o 'https://github.com/DavitTec/USB_probe/releases/tag/[^)]*' CHANGELOG.md | while read -r url; do
   if curl --output /dev/null --silent --head --fail "$url"; then
     echo "URL valid: $url"
   else
@@ -91,4 +111,4 @@ done
 
 echo "Tag, branch, and changelog sync complete. Check CHANGELOG.md and GitHub Releases."
 
-# end of script
+# End of script
