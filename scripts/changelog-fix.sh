@@ -1,7 +1,7 @@
 #!/bin/bash
 # changelog-fix.sh
-# Version: 0.2.5
-# Purpose: Format CHANGELOG.md and replace comparison URLs with release pages
+# Version: 0.2.8
+# Purpose: Format CHANGELOG.md and use release pages
 
 # Load environment variables
 if [ -f "./.env" ]; then
@@ -34,14 +34,12 @@ sed -i -E 's/^\* \*\*([^\*]+)\*\*/- \*\*\1\*\*/g' CHANGELOG.md
 
 # Replace comparison URLs with release pages
 log "Replacing comparison URLs with release pages..."
-sed -i 's|https://github.com/DavitTec/USB_probe/compare/\([^)]*\)|https://github.com/DavitTec/USB_probe/releases/tag/\1|g' CHANGELOG.md
+sed -i 's|https://github.com/DavitTec/usb_probe/compare/\([^)]*\)|https://github.com/DavitTec/usb_probe/releases/tag/\1|g' CHANGELOG.md
 
-# Run prettier to format
-pnpm run prettier --write CHANGELOG.md || {
-  log "ERROR: Prettier formatting failed."
+# Run prettier
+pnpm format || {
+  log "ERROR: Formatting failed."
   exit 1
 }
 
 log "Changelog formatting complete."
-
-# End of script

@@ -1,6 +1,6 @@
 #!/bin/bash
 # sync-tags.sh
-# Version: 0.0.10
+# Version: 0.0.13
 # Purpose: Sync local tags, branch, and changelog with remote GitHub repository
 
 # Exit on error
@@ -32,6 +32,24 @@ git checkout master
 git reset --hard origin/master
 git clean -f -d
 
+# Delete local tags
+echo "Deleting local tags..."
+git tag -l | xargs git tag -d || true
+
+# Create tags
+echo "Creating tags..."
+git tag -a v0.1.0 76c9d14 -m "Release v0.1.0"
+git tag -a v0.2.0 338fd0d -m "Release v0.2.0"
+git tag -a v0.3.0 532c5ec -m "Release v0.3.0"
+git tag -a v0.4.0 7fc0d67 -m "Release v0.4.0"
+git tag -a v0.5.0 c272659 -m "Release v0.5.0"
+git tag -a v0.6.0 c3d5733 -m "Release v0.6.0"
+git tag -a v0.7.0 c3b955c -m "Release v0.7.0"
+git tag -a v0.8.0 7670625 -m "Release v0.8.0"
+git tag -a v0.9.0 7d6dfc0 -m "Release v0.9.0"
+git tag -a v0.10.0 ec3258e -m "Release v0.10.0"
+git push origin v0.1.0 v0.2.0 v0.3.0 v0.4.0 v0.5.0 v0.6.0 v0.7.0 v0.8.0 v0.9.0 v0.10.0
+
 # Verify tags
 echo "Local tags:"
 git tag -l
@@ -57,7 +75,7 @@ cat >.markdownlint.json <<EOL
   "MD003": { "style": "atx" },
   "MD004": { "style": "dash" },
   "MD007": { "indent": 2 },
-  "MD013": { "line_length": 120 },
+  "MD013": { "line_length": 150 },
   "MD024": false,
   "MD031": true,
   "MD032": true,
@@ -77,8 +95,8 @@ pnpm changelog:fix || {
   echo "ERROR: Changelog fix failed."
   exit 1
 }
-pnpm run prettier --write CHANGELOG.md || {
-  echo "ERROR: Prettier formatting failed."
+pnpm format || {
+  echo "ERROR: Formatting failed."
   exit 1
 }
 
@@ -98,13 +116,24 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-# Validate changelog URLs
-echo "Validating changelog URLs..."
-grep -o 'https://github.com/DavitTec/USB_probe/releases/tag/[^)]*' CHANGELOG.md | while read -r url; do
+# Validate release URLs
+echo "Validating release URLs..."
+grep -o 'https://github.com/DavitTec/usb_probe/releases/tag/[^)]*' CHANGELOG.md | while read -r url; do
   if curl --output /dev/null --silent --head --fail "$url"; then
     echo "URL valid: $url"
   else
-    echo "ERROR: URL invalid: $url"
+    echo "ERROR: Release URL invalid: $url"
+    exit 1
+  fi
+done
+
+# Validate commit URLs
+echo "Validating commit URLs..."
+grep -o 'https://github.com/DavitTec/usb_probe/commit/[^)]*' CHANGELOG.md | while read -r url; do
+  if curl --output /dev/null --silent --head --fail "$url"; then
+    echo "URL valid: $url"
+  else
+    echo "ERROR: Commit URL invalid: $url"
     exit 1
   fi
 done
