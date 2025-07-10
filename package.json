@@ -47,6 +47,12 @@
     "preset": "angular",
     "releaseCount": 0,
     "tagPrefix": "v",
-    "compareUrlFormat": "https://github.com/DavitTec/USB_probe/compare/{{previousTag}}...{{currentTag}}"
+    "header": "# CHANGELOG\n\n",
+    "compareUrlFormat": "https://github.com/DavitTec/USB_probe/compare/{{previousTag}}...{{currentTag}}",
+    "writerOpts": {
+      "mainTemplate": "{{> header}}{{#each commitGroups}}{{#if this.title}}\n## {{this.title}} ({{dateFormat this.date 'YYYY-MM-DD'}})\n\n{{#each this.commits}}{{> commit}}\n{{/each}}{{/if}}{{/each}}",
+      "headerPartial": "",
+      "commitPartial": "- {{commit.message}} ([{{commit.hash}}]({{commit.commitUrl}}))\n"
+    }
   }
 }
