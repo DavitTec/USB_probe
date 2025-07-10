@@ -1,5 +1,5 @@
 {
-  "name": "usb-probe",
+  "name": "usb_probe",
   "version": "0.10.0",
   "description": "",
   "main": "index.js",
@@ -8,6 +8,7 @@
     "lint:sh": "shellcheck scripts/*.sh",
     "lint:md": "markdownlint . ",
     "format": "prettier --write . && markdownlint --fix .",
+    "prettier": "prettier --write .",
     "test": "bash tests/test_usb_info.sh",
     "commit": "cz",
     "prepare": "husky",
@@ -18,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davittec/usb-probe.git"
+    "url": "git+https://github.com/davittec/usb_probe.git"
   },
   "keywords": [
     "usb",
