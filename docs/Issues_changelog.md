@@ -29,7 +29,7 @@ in commit and comparison URLs due to a repository URL mismatch in `package.json`
    - **Description**: Lines in `docs/Issues_changelog.md` exceeded the 150-character limit, triggering `MD013` errors during `pnpm format` in the
      `husky` pre-commit hook.
    - **Root Cause**: Long lines in Markdown files (e.g., lines 5, 10, 11, 15) exceeded the `MD013` limit set in `.markdownlint.json` (`line_length: 
-150`).
+   150`).
    - **Impact**: `husky` pre-commit hook failed, preventing commits until lines were wrapped manually or the limit was adjusted.
 
 4. **Script Errors**:
@@ -102,12 +102,12 @@ in commit and comparison URLs due to a repository URL mismatch in `package.json`
     ```json
            "writerOpts": {
              "mainTemplate": "{{> header}}{{#each commitGroups}}\n## [{{commitGroupTitle}}]({{commitGroupUrl}}) ({{dateFormat date
-
+    
       'YYYY-MM-DD'}})\n\n{{#each commits}}{{> commit}}\n{{/each}}{{/each}}",
       "headerPartial": "",
       "commitPartial": "- {{commit.message}} ([{{commit.hash}}]({{commit.commitUrl}}))\n"
       }
-
+    
     ```
 
 3.  **Automate Markdown Formatting**:
@@ -249,39 +249,28 @@ in commit and comparison URLs due to a repository URL mismatch in `package.json`
 
      ```markdown
      ## Staging
-
+     
      - Create a staging branch: `git checkout -b staging`
      - Merge to master: `git checkout master; git merge staging`
-
+     
      ## Archiving
-
+     
      - Create a version archive: `git archive --format=tar.gz -o archive-vX.Y.Z.tar.gz vX.Y.Z`
      ```
 
 ## Script Table
 
-| Name | Description  
- | Version | Last Update |
-| ---------------------------------------------------------------------------------------------- |
-------------------------------------------------------------------------------------------- | ------- | ----------- |
-| [wrap_md.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/wrap_md.sh) | Wraps lines in Markdown files (`docs/*.md`) to
-`$MAX_LINE_LENGTH` from `.env` using `fold`. | 0.0.1 | 20250710 |
-| [changelog-fix.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/changelog-fix.sh) | Formats `CHANGELOG.md`, ensures `h2` headers,
-wraps lines, and validates URLs. | 0.2.11 | 20250710 |
-| [sync-tags.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/sync-tags.sh) | Syncs tags, recreates tags (`v0.1.0` to
-`v0.10.2`), and validates changelog URLs. | 0.0.16 | 20250710 |
-| [release.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/release.sh) | Manages version bumps, changelog generation, and
-release creation. | 0.2.16 | 20250710 |
-| [logging.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/logging.sh) | Provides logging utilities for other scripts
-(assumed to exist). | 0.2.1 | 20250708 |
-| [archive.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/archive.sh) | Archives project versions using `git archive`
-(placeholder, create if needed). | 0.1.0 | 20250710 |
-| [staging.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/staging.sh) | Manages staging branches and merges (placeholder,
-create if needed). | 0.1.0 | 20250710 |
-| [install.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/install.sh) | Sets up project dependencies and environment
-(placeholder, create if needed). | 0.1.0 | 20250710 |
-| [uninstall.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/uninstall.sh) | Removes project setup and cleans environment
-(placeholder, create if needed). | 0.1.0 | 20250710 |
+| Name | Description  | Version | Last Update |
+| ---------------------------------------------------------------------------------------------- |------------------------------------------------------------------------------------------- | ------- | ----------- |
+| [wrap_md.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/wrap_md.sh) | Wraps lines in Markdown files (`docs/*.md`) to `$MAX_LINE_LENGTH` from `.env` using `fold`. | 0.0.1 |  20250710 |
+| [changelog-fix.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/changelog-fix.sh) | Formats `CHANGELOG.md`, ensures `h2` headers,wraps lines, and validates URLs. | 0.2.11 | 20250710 |
+| [sync-tags.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/sync-tags.sh) | Syncs tags, recreates tags (`v0.1.0` to `v0.10.2`), and validates changelog URLs. |0.0.16|20250710|
+| [release.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/release.sh) | Manages version bumps, changelog generation, and release creation. | 0.2.16 | 20250710 |
+| [logging.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/logging.sh) | Provides logging utilities for other scripts (assumed to exist). | 0.2.1 | 20250708 |
+| [archive.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/archive.sh) | Archives project versions using `git archive`(placeholder, create if needed). | 0.1.0 | 20250710 |
+| [staging.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/staging.sh) | Manages staging branches and merges (placeholder,create if needed). | 0.1.0 | 20250710 |
+| [install.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/install.sh) | Sets up project dependencies and environment,(placeholder, create if needed). | 0.1.0 | 20250710 |
+| [uninstall.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/uninstall.sh) | Removes project setup and cleans environment (placeholder, create if needed). | 0.1.0 | 20250710 |
 
 ## Troubleshooting Guide
 
