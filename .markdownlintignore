@@ -1,0 +1,6 @@
+# .markdownlintignore
+
+./.davit/
+archives/
+logs/
+logs
