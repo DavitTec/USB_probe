@@ -260,17 +260,27 @@ in commit and comparison URLs due to a repository URL mismatch in `package.json`
 
 ## Script Table
 
-| Name | Description  | Version | Last Update |
-| ---------------------------------------------------------------------------------------------- |------------------------------------------------------------------------------------------- | ------- | ----------- |
-| [wrap_md.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/wrap_md.sh) | Wraps lines in Markdown files (`docs/*.md`) to `$MAX_LINE_LENGTH` from `.env` using `fold`. | 0.0.1 |  20250710 |
-| [changelog-fix.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/changelog-fix.sh) | Formats `CHANGELOG.md`, ensures `h2` headers,wraps lines, and validates URLs. | 0.2.11 | 20250710 |
-| [sync-tags.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/sync-tags.sh) | Syncs tags, recreates tags (`v0.1.0` to `v0.10.2`), and validates changelog URLs. |0.0.16|20250710|
-| [release.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/release.sh) | Manages version bumps, changelog generation, and release creation. | 0.2.16 | 20250710 |
-| [logging.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/logging.sh) | Provides logging utilities for other scripts (assumed to exist). | 0.2.1 | 20250708 |
-| [archive.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/archive.sh) | Archives project versions using `git archive`(placeholder, create if needed). | 0.1.0 | 20250710 |
-| [staging.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/staging.sh) | Manages staging branches and merges (placeholder,create if needed). | 0.1.0 | 20250710 |
-| [install.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/install.sh) | Sets up project dependencies and environment,(placeholder, create if needed). | 0.1.0 | 20250710 |
-| [uninstall.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/uninstall.sh) | Removes project setup and cleans environment (placeholder, create if needed). | 0.1.0 | 20250710 |
+| Name | Description | Version | Last Update |
+| ----------------------------------------------------------------------------------------------
+|------------------------------------------------------------------------------------------- | ------- | ----------- |
+| [wrap_md.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/wrap_md.sh) | Wraps lines in Markdown files (`docs/*.md`) to
+`$MAX_LINE_LENGTH` from `.env` using `fold`. | 0.0.1 | 20250710 |
+| [changelog-fix.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/changelog-fix.sh) | Formats `CHANGELOG.md`, ensures `h2` headers,wraps
+lines, and validates URLs. | 0.2.11 | 20250710 |
+| [sync-tags.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/sync-tags.sh) | Syncs tags, recreates tags (`v0.1.0` to `v0.10.2`), and
+validates changelog URLs. |0.0.16|20250710|
+| [release.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/release.sh) | Manages version bumps, changelog generation, and release
+creation. | 0.2.16 | 20250710 |
+| [logging.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/logging.sh) | Provides logging utilities for other scripts (assumed to
+exist). | 0.2.1 | 20250708 |
+| [archive.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/archive.sh) | Archives project versions using `git 
+archive`(placeholder, create if needed). | 0.1.0 | 20250710 |
+| [staging.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/staging.sh) | Manages staging branches and merges (placeholder,create
+if needed). | 0.1.0 | 20250710 |
+| [install.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/install.sh) | Sets up project dependencies and
+environment,(placeholder, create if needed). | 0.1.0 | 20250710 |
+| [uninstall.sh](https://github.com/DavitTec/usb_probe/blob/master/scripts/utils/uninstall.sh) | Removes project setup and cleans environment
+(placeholder, create if needed). | 0.1.0 | 20250710 |
 
 ## Troubleshooting Guide
 
